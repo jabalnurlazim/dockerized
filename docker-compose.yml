@@ -1,0 +1,68 @@
+version: '3.8'
+services:
+  java-db:
+    restart: always
+    image: mysql:8.0.21
+    volumes:
+      - ./java-db/data:/var/lib/mysql
+    env_file:
+      - ./env/.env
+      - ./env/.mysql
+  nginx:
+    restart: always
+    image: nginx:1.19.6
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    env_file:
+      - ./env/.env
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+      - target: 8000
+        published: 8000
+        mode: host
+      - target: 8080
+        published: 8080
+        mode: host
+      - target: 3000
+        published: 3000
+        mode: host
+    deploy:
+      restart_policy:
+        condition: any
+  java:
+    restart: always
+    image: maven:3.6.3-openjdk-8
+    working_dir: /usr/src/app
+    build:
+      context: ./java
+    env_file:
+      - ./env/.env
+      - ./env/.mysql
+      - ./env/.java
+    volumes:
+      - ./java:/usr/src/app/
+    entrypoint: /usr/src/app/entrypoint.sh
+    expose:
+      - 8080
+  redis:
+    restart: always
+    image: redis:4.0.14
+    volumes:
+      - redis-data:/data
+  nuxtjs:
+    image: node:15.5.1
+    working_dir: /usr/src/app
+    volumes:
+      - ./nuxtjs:/usr/src/app/
+    env_file:
+      - ./env/.env
+    build:
+      context: ./nuxtjs
+    entrypoint: /usr/src/app/entrypoint.sh
+    expose:
+      - 3000
+volumes:
+  redis-data:
