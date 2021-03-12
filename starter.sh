@@ -5,9 +5,9 @@ ORANGE='\033[0;33m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-git submodule init
-git submodule update --recursive --remote --merge --force
-docker-compose pull
+# git submodule init
+# git submodule update --recursive --remote --merge --force
+# docker-compose pull
 docker-compose up -d
 
 # Service Access Information Section
